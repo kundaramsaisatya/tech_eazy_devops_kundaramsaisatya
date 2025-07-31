@@ -1,23 +1,16 @@
-FROM python:3.9
+FROM python:3.9-slim
 
-# Set working directory to /app
 WORKDIR /app
 
-# Copy requirements first for better caching
 COPY requirements.txt .
 
-# Install system dependencies and Python packages
-RUN apt-get update && apt-get install -y \
-    gcc default-libmysqlclient-dev pkg-config && \
-    pip install mysqlclient && \
-    pip install --no-cache-dir -r requirements.txt && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all backend code
 COPY . .
 
-# Expose Django default port
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
 EXPOSE 8000
 
-# Run Django server
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
